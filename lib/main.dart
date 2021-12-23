@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 // Copyright 2019 The Chromium Authors. All rights reserved.
@@ -10,12 +11,13 @@ import 'dart:async';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  FirebaseApp defaultApp = await Firebase.initializeApp(options: FirebaseOptions(
-    appId: 'com.android.application', 
+  FirebaseApp defaultApp = await Firebase.initializeApp(
+      options: FirebaseOptions(
+    appId: 'com.android.application',
     apiKey: 'AIzaSyAgUhHU8wSJgO5MVNy95tMT07NEjzMOfz0',
     projectId: 'react-native-firebase-testing',
     messagingSenderId: '448618578101',
-    ));
+  ));
   // print(defaultApp.hashCode);
   // print('ekhane');
 // or
@@ -29,11 +31,17 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // get();
+  }
+
   int counter = 0;
 
   void increment() {
-    Reference ref = FirebaseStorage.instance.ref().child('test');
-    ref.putString('Hello Flutter ${Random().nextInt(100)}');
+    // Reference ref = FirebaseStorage.instance.ref().child('test');
+    // ref.putString('Hello Flutter ${Random().nextInt(100)}');
     setState(() {
       counter++;
     });
@@ -47,15 +55,27 @@ class _MyAppState extends State<MyApp> {
         projectId: 'react-native-firebase-testing',
         messagingSenderId: '448618578101',
       );
-void apps() {
+  void apps() {
     final List<FirebaseApp> apps = Firebase.apps;
     print('Currently initialized apps: $apps');
   }
+
   Future<void> initializeSecondary() async {
     FirebaseApp app =
         await Firebase.initializeApp(name: name, options: firebaseOptions);
 
     print('Initialized $app');
+  }
+
+  get() {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    firestore.collection("my_data").get().then((querySnapshot) {
+      print(querySnapshot);
+      // querySnapshot.docs.forEach((result) {
+      //   print(result.data());
+      //   print('object');
+      // });
+    });
   }
 
   // This widget is the root of your application.
@@ -90,10 +110,15 @@ void apps() {
                 onPressed: () => increment(),
                 child: const Text('Initialize secondary app'),
               ),
-               ElevatedButton(
+              ElevatedButton(
                 onPressed: apps,
                 child: const Text('Get apps'),
               ),
+              ElevatedButton(onPressed: () {
+                   FirebaseFirestore.instance
+                .collection('my_data')
+                .add({'name': 'data added through app'});
+              }, child: Text('sfsfsfs'))
             ],
           ),
         ),
